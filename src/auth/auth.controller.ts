@@ -10,13 +10,31 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  public async login(@Body() userLoginDto: UserLoginDto) {
+  public async login(
+    @Body() userLoginDto: UserLoginDto,
+  ): Promise<Record<string, any>> {
     const user: Omit<UserLogin, 'passwordHash'> =
       await this._authService.userLogin(userLoginDto);
 
-    console.log(user);
+    return {
+      user: {
+        ...user,
+      },
+    };
   }
 
+  @HttpCode(HttpStatus.CREATED)
   @Post('signup')
-  public async signup(@Body() userSignupDto: UserSignupDto) {}
+  public async signup(
+    @Body() userSignupDto: UserSignupDto,
+  ): Promise<Record<string, any>> {
+    const newUser: Omit<UserLogin, 'passwordHash'> =
+      await this._authService.userSignup(userSignupDto);
+
+    return {
+      user: {
+        ...newUser,
+      },
+    };
+  }
 }

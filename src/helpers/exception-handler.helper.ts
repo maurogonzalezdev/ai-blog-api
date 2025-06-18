@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   ConflictException,
   ForbiddenException,
@@ -70,27 +71,31 @@ export const exceptionHandler = (error: unknown): never => {
   }
 
   if (error instanceof ForbiddenException) {
-    throw new HttpException(error.initMessage, HttpStatus.FORBIDDEN);
+    throw new HttpException(error.message, HttpStatus.FORBIDDEN);
   }
 
   if (error instanceof RequestTimeoutException) {
-    throw new HttpException(error.initMessage, HttpStatus.REQUEST_TIMEOUT);
+    throw new HttpException(error.message, HttpStatus.REQUEST_TIMEOUT);
   }
 
   if (error instanceof ConflictException) {
-    throw new HttpException(error.initMessage, HttpStatus.CONFLICT);
+    throw new HttpException(error.message, HttpStatus.CONFLICT);
   }
 
   if (error instanceof UnauthorizedException) {
-    throw new HttpException(error.initMessage, HttpStatus.UNAUTHORIZED);
+    throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
   }
 
   if (error instanceof BadRequestException) {
-    throw new HttpException(error.initMessage, HttpStatus.BAD_REQUEST);
+    throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
   }
 
   if (error instanceof ServiceUnavailableException) {
-    throw new HttpException(error.initMessage, HttpStatus.SERVICE_UNAVAILABLE);
+    throw new HttpException(error.message, HttpStatus.SERVICE_UNAVAILABLE);
+  }
+
+  if (error instanceof BadGatewayException) {
+    throw new HttpException(error.message, HttpStatus.BAD_GATEWAY);
   }
 
   throw new HttpException(

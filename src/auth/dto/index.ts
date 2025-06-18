@@ -1,2 +1,2 @@
-export * from '@api/auth/dto/user-login.dto';
-export * from '@api/auth/dto/user-signup.dto';
+export * from '@api/auth/dto/user-log-in.dto';
+export * from '@api/auth/dto/user-sign-up.dto';

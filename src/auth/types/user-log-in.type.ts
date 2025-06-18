@@ -1,6 +1,6 @@
 import { Role } from 'generated/prisma';
 
-export type UserLogin = {
+export type UserLogIn = {
   id: string;
   username: string;
   passwordHash: string;

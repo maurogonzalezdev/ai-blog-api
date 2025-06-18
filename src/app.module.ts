@@ -9,7 +9,10 @@ import { UsersModule } from '@api/users/users.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ cache: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+    }),
     PrismaModule,
     UsersModule,
     AuthModule,

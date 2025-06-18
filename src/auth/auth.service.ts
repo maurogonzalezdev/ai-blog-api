@@ -6,15 +6,19 @@ import {
 
 import { exceptionHandler, usernamePrefix } from '@api/helpers';
 import { hashPassword, comparePassword, shortUniqueId } from '@api/libs';
+import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@api/prisma/prisma.service';
-import { UserLogin } from '@api/auth/types';
-import { UserLoginDto, UserSignupDto } from '@api/auth/dto';
+import { UserLogIn, JwtPayload } from '@api/auth/types';
+import { UserLogInDto, UserSignUpDto } from '@api/auth/dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly _prismaService: PrismaService) {}
+  constructor(
+    private readonly _prismaService: PrismaService,
+    private readonly _jwtService: JwtService,
+  ) {}
 
-  private async _findUser(email: string): Promise<UserLogin | null> {
+  private async _findUser(email: string): Promise<UserLogIn | null> {
     return this._prismaService.user.findFirst({
       where: {
         email,
@@ -29,7 +33,7 @@ export class AuthService {
     });
   }
 
-  private _userAccountStatus(user: UserLogin): void {
+  private _userAccountStatus(user: UserLogIn): void {
     if (!user.isActive) {
       throw new BadRequestException(
         'User account is inactive, please contact site admin',
@@ -39,7 +43,7 @@ export class AuthService {
     return;
   }
 
-  private _validateUser(user: UserLogin | null): void {
+  private _validateUser(user: UserLogIn | null): void {
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -54,12 +58,21 @@ export class AuthService {
     return `${usernamePrefix()}-${shortUniqueId()}`;
   }
 
-  public async userLogin({
+  public async jwtSignAsync(jwtPayload: JwtPayload): Promise<string> {
+    try {
+      const jwt: string = await this._jwtService.signAsync(jwtPayload);
+      return jwt;
+    } catch (error: unknown) {
+      throw exceptionHandler(error);
+    }
+  }
+
+  public async userLogIn({
     email,
     password,
-  }: UserLoginDto): Promise<Omit<UserLogin, 'passwordHash'>> {
+  }: UserLogInDto): Promise<Omit<UserLogIn, 'passwordHash'>> {
     try {
-      const user: UserLogin | null = await this._findUser(email);
+      const user: UserLogIn | null = await this._findUser(email);
 
       this._validateUser(user);
 
@@ -89,12 +102,12 @@ export class AuthService {
     }
   }
 
-  public async userSignup({
+  public async userSignUp({
     email,
     password,
-  }: UserSignupDto): Promise<Omit<UserLogin, 'passwordHash'>> {
+  }: UserSignUpDto): Promise<Omit<UserLogIn, 'passwordHash'>> {
     try {
-      const userFound: UserLogin | null = await this._findUser(email);
+      const userFound: UserLogIn | null = await this._findUser(email);
 
       if (userFound) {
         this._userAccountStatus(userFound);
@@ -107,7 +120,7 @@ export class AuthService {
         shortUniqueId,
       );
 
-      const newUser: Omit<UserLogin, 'passwordHash'> =
+      const newUser: Omit<UserLogIn, 'passwordHash'> =
         await this._prismaService.user.create({
           data: {
             email,

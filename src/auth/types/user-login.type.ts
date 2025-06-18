@@ -1,5 +1,9 @@
+import { Role } from 'generated/prisma';
+
 export type UserLogin = {
   id: string;
-  isActive: boolean;
+  username: string;
   passwordHash: string;
+  role: Role;
+  isActive: boolean;
 };

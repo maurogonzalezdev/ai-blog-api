@@ -25,7 +25,7 @@ model User {
   isActive     Boolean   @default(true) @db.Bool
   createdAt    DateTime  @default(now()) @db.Date
   updatedAt    DateTime  @updatedAt @db.Date
-  lastLogin    DateTime? @db.Timestamp
+  lastLogin    DateTime? @db.Date
 
   @@map("users")
 }
